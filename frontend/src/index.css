@@ -1,0 +1,19 @@
+/* @import "tailwindcss"; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --wearx-red: #c1121f;
+}
+
+.bg-wearx-red {
+  background-color: var(--wearx-red);
+}
+
+
+#root{
+  font-family: "Inter" , sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
