@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { Outlet } from "react-router-dom";
 import AdminSideBar from "./AdminSideBar";
@@ -46,3 +47,4 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
+
