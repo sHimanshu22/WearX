@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const CardDrawer = ({ DrawerOpen, setDraweropen }) => {
 const navigate = useNavigate();
   const handleCheckOut = () =>{
-    setDraweropen();
+    setDraweropen(false);
     navigate("/checkout")
   }
   return (

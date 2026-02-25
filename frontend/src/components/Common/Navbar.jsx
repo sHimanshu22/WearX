@@ -57,7 +57,7 @@ const Navbar = () => {
                 <button onClick={togggleCartDrawer} className='relative hover:text-black'>
                     <HiOutlineShoppingBag className='h-6 w-6 text-gray-700'/>
                     <span className='absolute -top-1  bg-[#ea2e0e] text-white text-xs rounded-full px-2 py-0.5'>
-                    4 
+                    2
                     </span>
                 </button>
                 {/* Search */}
