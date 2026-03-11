@@ -4,6 +4,8 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productsRoutes');
+const CartRoutes = require('./routes/CartRoutes');
+
 
 const app = express();
 app.use(express.json());
@@ -23,6 +25,9 @@ app.get("/" ,( req,res) => {
 // API Routes
 app.use("/api/users", userRoutes)
 app.use("/api/products", productRoutes)
+app.use("/api/cart", CartRoutes)
+
+
 
 
 app.listen(PORT ,() =>{
