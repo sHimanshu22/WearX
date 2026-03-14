@@ -2,10 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-const userRoutes = require('./routes/userRoutes');
-const productRoutes = require('./routes/productsRoutes');
-const CartRoutes = require('./routes/CartRoutes');
-
+const userRoutes = require("./routes/userRoutes");
+const productRoutes = require("./routes/productsRoutes");
+const CartRoutes = require("./routes/CartRoutes");
+const CheckoutRoutes = require("./routes/CheckoutRoutes");
 
 const app = express();
 app.use(express.json());
@@ -18,18 +18,17 @@ const PORT = process.env.PORT || 3000;
 //connect to mongoDB Database
 connectDB();
 
-app.get("/" ,( req,res) => {
-    res.send("Welcom to WearX API")
+app.get("/", (req, res) => {
+  res.send("Welcom to WearX API");
 });
 
 // API Routes
-app.use("/api/users", userRoutes)
-app.use("/api/products", productRoutes)
-app.use("/api/cart", CartRoutes)
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", CartRoutes);
+app.use("/api/checkout", CheckoutRoutes);
 
 
-
-
-app.listen(PORT ,() =>{
-    console.log(`server is running on http://localhost:${PORT}`);
-})
+app.listen(PORT, () => {
+  console.log(`server is running on http://localhost:${PORT}`);
+});
