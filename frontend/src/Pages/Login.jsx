@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import login from "../assets/login.webp";
+import { loginUser } from "../redux/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
 
-   const handleSubmit = (e) =>{
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("User Login:", {email,password});
+    dispatch(loginUser({ email, password }));
   };
 
   return (
@@ -46,7 +49,7 @@ const Login = () => {
             />
           </div>
           <button
-          onClick={handleSubmit}
+            onClick={handleSubmit}
             type="submit"
             className="w-full bg-black text-white p-2 rounded-lg font-semibold hover:bg-gray-800"
           >
@@ -63,7 +66,11 @@ const Login = () => {
 
       <div className="hidden md:block w-1/2 bg-gray-800">
         <div className="h-full flex flex-col justify-center items-center">
-            <img src={login} alt="Login to Account" className="h-[750px] w-full object-cover" />
+          <img
+            src={login}
+            alt="Login to Account"
+            className="h-[750px] w-full object-cover"
+          />
         </div>
       </div>
     </div>
