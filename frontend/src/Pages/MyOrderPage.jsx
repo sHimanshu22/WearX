@@ -1,57 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect} from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { fetchUserOrders } from "../redux/slices/orderSlice";
 
 const MyOrderPage = () => {
-  const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { orders, loading, error } = useSelector((state) => state.order);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const mockOrders = [
-        {
-          _id: "12345",
-          createdAt: new Date(),
-          shippingAddress: {
-            city: "New York",
-            country: "USA",
-          },
-          orderItems: [
-            {
-              name: "Product 1",
-              images: "https://picsum.photos/500/500?random=1",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          _id: "34567",
-          createdAt: new Date(),
-          shippingAddress: {
-            city: "Delhi",
-            country: "India",
-          },
-          orderItems: [
-            {
-              name: "Product 2",
-              images: "https://picsum.photos/500/500?random=2",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-      ];
-
-      setOrders(mockOrders);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    dispatch(fetchUserOrders());
+  }, [dispatch]);
 
   // ✅ FIXED: handler now receives orderId directly
   const handleRowClick = (orderId) => {
     navigate(`/order/${orderId}`);
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (loading) return <p>Error : {error}</p>;
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
@@ -106,9 +73,7 @@ const MyOrderPage = () => {
                     {order.orderItems.length}
                   </td>
 
-                  <td className="py-2 px-2 sm:px-4">
-                    ${order.totalPrice}
-                  </td>
+                  <td className="py-2 px-2 sm:px-4">${order.totalPrice}</td>
 
                   <td className="py-2 px-2 sm:px-4">
                     <span
@@ -125,10 +90,7 @@ const MyOrderPage = () => {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={7}
-                  className="py-4 px-4 text-center text-gray-500"
-                >
+                <td colSpan={7} className="py-4 px-4 text-center text-gray-500">
                   You have no orders
                 </td>
               </tr>

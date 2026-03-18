@@ -1,12 +1,25 @@
 import React from "react";
-import { FaBoxOpen, FaClipboardList, FaSignOutAlt, FaStore, FaUser } from "react-icons/fa";
-import { NavLink , Link, useNavigate} from "react-router-dom";
+import {
+  FaBoxOpen,
+  FaClipboardList,
+  FaSignOutAlt,
+  FaStore,
+  FaUser,
+} from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { logout } from "../../redux/slices/authSlice";
+import { clearCart } from "../../redux/slices/cartSlice";
 
 const AdminSideBar = () => {
- const navigate = useNavigate();
-    const handleLogOut = () =>{
-        navigate('/');
-    }
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogOut = () => {
+    dispatch(logout());
+    dispatch(clearCart());
+    navigate("/");
+  };
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -63,10 +76,12 @@ const AdminSideBar = () => {
         </NavLink>
       </nav>
       <div className="mt-6">
-        <button onClick={handleLogOut} className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded flex items-centre justify-center space-x-2">
-            <FaSignOutAlt/>
-            <span>Logout</span>
-            
+        <button
+          onClick={handleLogOut}
+          className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded flex items-centre justify-center space-x-2"
+        >
+          <FaSignOutAlt />
+          <span>Logout</span>
         </button>
       </div>
     </div>

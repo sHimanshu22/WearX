@@ -6,7 +6,7 @@ import {
   fetchProductsByFilters,
   setFilters,
 } from "../../redux/slices/productSlice";
-
+ 
 const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);

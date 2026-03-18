@@ -84,7 +84,7 @@ const orderSlice = createSlice({
 
     .addCase(fetchOrderDetails.fulfilled, (state, action) => {
       state.loading = false;
-      state.orders = action.payload.orders || action.payload;
+        state.orderDetails = action.payload; // ✅ THIS FIX
       state.totalOrders = action.payload.totalOrders || action.payload.length;
     })
 

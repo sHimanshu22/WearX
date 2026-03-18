@@ -1,67 +1,77 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchAdminProducts } from "../redux/slices/adminProductsSlice";
+import { fetchAllOrders } from "../redux/slices/adminOrderSlice";
 
 const AdminHomePage = () => {
-  const orders = [
-    {
-      _id: 123123,
-      user: { name: "John Doe" },
-      totalPrice: 110,
-      status: "Processing",
-    },
-    {
-      _id: 456789,
-      user: { name: "Jane Smith" },
-      totalPrice: 250,
-      status: "Delivered",
-    },
-    {
-      _id: 789456,
-      user: { name: "Michael Brown" },
-      totalPrice: 89,
-      status: "Pending",
-    },
-    {
-      _id: 321654,
-      user: { name: "Emily Davis" },
-      totalPrice: 420,
-      status: "Shipped",
-    },
-    {
-      _id: 654987,
-      user: { name: "David Wilson" },
-      totalPrice: 175,
-      status: "Cancelled",
-    },
-  ];
+  const dispatch = useDispatch();
+
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+  } = useSelector((state) => state.adminProducts);
+
+  // ✅ FIX: correct slice name (adminOrder instead of adminOrders)
+  const {
+    order,
+    totalOrders,
+    totalSales,
+    loading: ordersLoading,
+    error: orderError,
+  } = useSelector((state) => state.adminOrder);
+
+  // ✅ FIX: call functions + add dependency array
+  useEffect(() => {
+    dispatch(fetchAdminProducts());
+    dispatch(fetchAllOrders());
+  }, [dispatch]);
 
   return (
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="p-4 shadow-md rounded-lg">
-          <h2 className="text-xl font-semibold">Revenue</h2>
-          <p className="text-2xl">$100000</p>
-        </div>
+      {productsLoading || ordersLoading ? (
+        <p>Loading...</p>
+      ) : productsError ? (
+        <p className="text-red-500">
+          Error fetching Products : {productsError}
+        </p>
+      ) : orderError ? (
+        <p className="text-red-500">
+          Error fetching Orders : {orderError}
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="p-4 shadow-md rounded-lg">
+            <h2 className="text-xl font-semibold">Revenue</h2>
+            <p className="text-2xl">{totalSales.toFixed(2)}</p>
+          </div>
 
-        <div className="p-4 shadow-md rounded-lg">
-          <h2 className="text-xl font-semibold">Total Orders</h2>
-          <p className="text-2xl">200</p>
-          <Link to="/admin/orders" className="text-blue-500 hover:underline">
-            Manage Orders
-          </Link>
-        </div>
+          <div className="p-4 shadow-md rounded-lg">
+            <h2 className="text-xl font-semibold">Total Orders</h2>
+            <p className="text-2xl">{totalOrders}</p>
+            <Link
+              to="/admin/orders"
+              className="text-blue-500 hover:underline"
+            >
+              Manage Orders
+            </Link>
+          </div>
 
-        <div className="p-4 shadow-md rounded-lg">
-          <h2 className="text-xl font-semibold">Total Products</h2>
-          <p className="text-2xl">100</p>
-          <Link to="/admin/products" className="text-blue-500 hover:underline">
-            Manage Products
-          </Link>
+          <div className="p-4 shadow-md rounded-lg">
+            <h2 className="text-xl font-semibold">Total Products</h2>
+            <p className="text-2xl">{products.length}</p>
+            <Link
+              to="/admin/products"
+              className="text-blue-500 hover:underline"
+            >
+              Manage Products
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Recent Orders */}
       <div className="mt-6">
@@ -79,16 +89,23 @@ const AdminHomePage = () => {
             </thead>
 
             <tbody>
-              {orders.length > 0 ? (
-                orders.map((order) => (
+              {/* ✅ FIX: safe optional chaining */}
+              {order?.length > 0 ? (
+                order.map((orderItem) => (
                   <tr
-                    key={order._id}
+                    key={orderItem._id}
                     className="border-b hover:bg-gray-50 cursor-pointer"
                   >
-                    <td className="p-4">{order._id}</td>
-                    <td className="p-4">{order.user.name}</td>
-                    <td className="p-4">${order.totalPrice}</td>
-                    <td className="p-4">{order.status}</td>
+                    <td className="p-4">{orderItem._id}</td>
+                    <td className="p-4">
+                      {orderItem.user?.name || "N/A"}
+                    </td>
+                    <td className="p-4">
+                      ${orderItem.totalPrice.toFixed(2)}
+                    </td>
+                    <td className="p-4">
+                      {orderItem.status || "Pending"}
+                    </td>
                   </tr>
                 ))
               ) : (

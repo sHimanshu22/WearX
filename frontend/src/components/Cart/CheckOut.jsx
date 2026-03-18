@@ -1,30 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PaypalButton from "./PaypalButton";
-const cart = {
-  products: [
-    {
-      name: "Stylish Jacket",
-      size: "M",
-      color: "Black",
-      price: 120,
-      image: "https://picsum.photos/150?random=1",
-    },
-    {
-      name: "Casual Sneakers",
-      size: "42",
-      color: "White",
-      price: 75,
-      image: "https://picsum.photos/150?random=2",
-    },
-  ],
-  totalPrice: 195,
-};
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { createCheckout } from "../../redux/slices/checkoutSlice";
 
 const CheckOut = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { cart, loading, error } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.auth);
+
   const [checkoutId, setCheckoutId] = useState(null);
-  const [shippingAdress, setShippingAdress] = useState({
+  const [shippingAddress, setShippingAddress] = useState({
     firstname: "",
     lastname: "",
     address: "",
@@ -34,16 +22,78 @@ const CheckOut = () => {
     phone: "",
   });
 
-  const handleCreatecheckout = (e) => {
+  //Ensure that cart is loaded before proceeding
+  useEffect(() => {
+    if (!cart || !cart.products || cart.products.length === 0) {
+      navigate("/");
+    }
+  }, [cart, navigate]);
+
+  const handleCreatecheckout = async (e) => {
     e.preventDefault();
-    setCheckoutId(123);
+    if (cart && cart.products.length > 0) {
+      const res = await dispatch(
+        createCheckout({
+          checkoutItems: cart.products,
+          shippingAddress,
+          paymentMethod: "Paypal",
+          totalPrice: cart.totalPrice,
+        }),
+      );
+      if (res.payload && res.payload._id) {
+        setCheckoutId(res.payload._id); //set checkout id if checkout id was successful
+      }
+    }
   };
 
-  const handlePaymentSuccess = (details) => {
-    console.log("Payment Succesful", details);
-    navigate("/order-confirmation");
+  const handlePaymentSuccess = async (details) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/pay`, // ✅ FIXED
+        { paymentStatus: "paid", paymentDetails: details },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        await handleFinalizeCheckout(checkoutId); // ✅ only run if success
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
+  const handleFinalizeCheckout = async (checkout) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/finalize`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        },
+      );
+      navigate("/order-confirmation");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (loading) {
+    return <p>Loading cart ...</p>;
+  }
+
+  if (error) {
+    return <p>Error :{error}</p>;
+  }
+
+  if (!cart || !cart.products || cart.products.length === 0) {
+    return <p>Your cart is Empty</p>;
+  }
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto py-10 px-6 tracking-tighter">
       {/* Left Section */}
@@ -55,7 +105,7 @@ const CheckOut = () => {
             <label className="block text-gray-700">Email</label>
             <input
               type="email"
-              value="user@example.com"
+              value={user ? user.email : ""}
               className="w-full p-2 border rounded"
               disabled
             />
@@ -66,10 +116,10 @@ const CheckOut = () => {
               <label className="block text-gray-700">First Name</label>
               <input
                 type="text"
-                value={shippingAdress.firstname}
+                value={shippingAddress.firstname}
                 onChange={(e) =>
-                  setShippingAdress({
-                    ...shippingAdress,
+                  setShippingAddress({
+                    ...shippingAddress,
                     firstname: e.target.value,
                   })
                 }
@@ -81,10 +131,10 @@ const CheckOut = () => {
               <label className="block text-gray-700">Last Name</label>
               <input
                 type="text"
-                value={shippingAdress.lastname}
+                value={shippingAddress.lastname}
                 onChange={(e) =>
-                  setShippingAdress({
-                    ...shippingAdress,
+                  setShippingAddress({
+                    ...shippingAddress,
                     lastname: e.target.value,
                   })
                 }
@@ -97,10 +147,10 @@ const CheckOut = () => {
             <label className="block text-gray-700">Address</label>
             <input
               type="text"
-              value={shippingAdress.address}
+              value={shippingAddress.address}
               onChange={(e) =>
-                setShippingAdress({
-                  ...shippingAdress,
+                setShippingAddress({
+                  ...shippingAddress,
                   address: e.target.value,
                 })
               }
@@ -113,10 +163,10 @@ const CheckOut = () => {
               <label className="block text-gray-700">City</label>
               <input
                 type="text"
-                value={shippingAdress.city}
+                value={shippingAddress.city}
                 onChange={(e) =>
-                  setShippingAdress({
-                    ...shippingAdress,
+                  setShippingAddress({
+                    ...shippingAddress,
                     city: e.target.value,
                   })
                 }
@@ -128,10 +178,10 @@ const CheckOut = () => {
               <label className="block text-gray-700">PostalCode</label>
               <input
                 type="text"
-                value={shippingAdress.postalCode}
+                value={shippingAddress.postalCode}
                 onChange={(e) =>
-                  setShippingAdress({
-                    ...shippingAdress,
+                  setShippingAddress({
+                    ...shippingAddress,
                     postalCode: e.target.value,
                   })
                 }
@@ -143,10 +193,10 @@ const CheckOut = () => {
               <label className="block text-gray-700">Country</label>
               <input
                 type="text"
-                value={shippingAdress.country}
+                value={shippingAddress.country}
                 onChange={(e) =>
-                  setShippingAdress({
-                    ...shippingAdress,
+                  setShippingAddress({
+                    ...shippingAddress,
                     country: e.target.value,
                   })
                 }
@@ -158,10 +208,10 @@ const CheckOut = () => {
               <label className="block text-gray-700">Phone</label>
               <input
                 type="text"
-                value={shippingAdress.phone}
+                value={shippingAddress.phone}
                 onChange={(e) =>
-                  setShippingAdress({
-                    ...shippingAdress,
+                  setShippingAddress({
+                    ...shippingAddress,
                     phone: e.target.value,
                   })
                 }
@@ -183,7 +233,7 @@ const CheckOut = () => {
                 <h3 className="text-lgm mb-4">Pay with Payapal</h3>
                 {/* Paypal component */}
                 <PaypalButton
-                  amount={100}
+                  amount={cart.totalPrice}
                   onSuccess={handlePaymentSuccess}
                   onError={(err) => alert("Payment Failed , Try Again")}
                 />

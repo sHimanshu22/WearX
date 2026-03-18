@@ -1,14 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Retrieve user info and token from localStorage if available
+// Helper to generate guest ID
+const generateGuestId = () => `guest_${Date.now()}`;
+
+// Retrieve user info from localStorage
 const userFromStorage = localStorage.getItem("userInfo")
   ? JSON.parse(localStorage.getItem("userInfo"))
   : null;
 
-// Check for existing guest ID or generate new one
+// Get or create guest ID
 const initialGuestId =
-  localStorage.getItem("guestId") || `guest_${new Date().getTime()}`;
+  localStorage.getItem("guestId") || generateGuestId();
 
 localStorage.setItem("guestId", initialGuestId);
 
@@ -20,14 +23,14 @@ const initialState = {
   error: null,
 };
 
-// Async Thunk for User Login
+// ================= LOGIN =================
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/users/login`,
-        userData,
+        userData
       );
 
       localStorage.setItem("userInfo", JSON.stringify(response.data.user));
@@ -35,19 +38,21 @@ export const loginUser = createAsyncThunk(
 
       return response.data.user;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Login failed" }
+      );
     }
-  },
+  }
 );
 
-// Async Thunk for User Registration
+// ================= REGISTER =================
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/users/register`,
-        userData,
+        userData
       );
 
       localStorage.setItem("userInfo", JSON.stringify(response.data.user));
@@ -55,33 +60,36 @@ export const registerUser = createAsyncThunk(
 
       return response.data.user;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Register failed" }
+      );
     }
-  },
+  }
 );
 
-//slice
-
+// ================= SLICE =================
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
     logout: (state) => {
       state.user = null;
-      state.guestId = `guest_${new Date().getItem()}`; // Reset Guest ID on logout
+      state.guestId = generateGuestId(); // ✅ FIXED
 
       localStorage.removeItem("userInfo");
       localStorage.removeItem("userToken");
-      localStorage.setItem("guestId", state.guestId); // set new guest ID in localStorage
+      localStorage.setItem("guestId", state.guestId);
     },
+
     generateNewGuestId: (state) => {
-      state.guestId = `guest_${new Date().getTime()}`;
+      state.guestId = generateGuestId();
       localStorage.setItem("guestId", state.guestId);
     },
   },
 
   extraReducers: (builder) => {
     builder
+      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -94,6 +102,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || "Login Failed";
       })
+
+      // REGISTER
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;

@@ -33,11 +33,11 @@ export const fetchProductsByFilters = createAsyncThunk(
     if (limit) query.append("limit", limit);
 
     const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/products?${query.toString()}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/products?${query.toString()}`,
     );
 
     return response.data;
-  }
+  },
 );
 
 //Async thunk to fetch a single product by ID
@@ -47,11 +47,11 @@ export const fetchProductDetails = createAsyncThunk(
     const productId = typeof id === "object" ? id._id : id; // ✅ FIX
 
     const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/products/${productId}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/products/${productId}`,
     );
 
     return response.data;
-  }
+  },
 );
 
 //Async thunk to update product
@@ -65,11 +65,11 @@ export const updateProduct = createAsyncThunk(
         headers: {
           Authorization: `Bearer ${localStorage.getItem("userToken")}`,
         },
-      }
+      },
     );
 
     return response.data;
-  }
+  },
 );
 
 //Async thunk to fetch similar products
@@ -79,18 +79,18 @@ export const fetchSimilarProducts = createAsyncThunk(
     const productId = typeof id === "object" ? id._id : id; // ✅ FIX
 
     const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/products/similar/${productId}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/products/similar/${productId}`,
     );
 
     return response.data;
-  }
+  },
 );
 
 const productsSlice = createSlice({
   name: "products",
   initialState: {
     products: [],
-    selectedProducts: null,
+    selectedProduct: null,
     similarProducts: [],
     loading: false,
     error: null,
@@ -109,7 +109,6 @@ const productsSlice = createSlice({
     },
   },
 
-  // ❌ reducer → ✅ reducers
   reducers: {
     setFilters: (state, action) => {
       state.filters = { ...state.filters, ...action.payload };
@@ -154,7 +153,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProductDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedProducts = action.payload; // ✅ FIX
+        state.selectedProduct = action.payload; // ✅ FIX
       })
       .addCase(fetchProductDetails.rejected, (state, action) => {
         state.loading = false;
@@ -164,12 +163,14 @@ const productsSlice = createSlice({
       // Update product
       .addCase(updateProduct.fulfilled, (state, action) => {
         const index = state.products.findIndex(
-          (product) => product._id === action.payload._id // ✅ FIX
+          (product) => product._id === action.payload._id, // ✅ FIX
         );
 
         if (index !== -1) {
           state.products[index] = action.payload; // ✅ FIX
         }
+
+        state.selectedProduct = updateProduct;
       })
 
       // Similar products
