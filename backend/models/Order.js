@@ -98,7 +98,7 @@ const orderSchema = new mongoose.Schema(
       default: "Processing",
     },
   },
-  { timeseries: true },
+  { timestamps: true },
 );
 
 export default mongoose.model("Order", orderSchema);

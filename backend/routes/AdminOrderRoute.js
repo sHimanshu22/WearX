@@ -10,9 +10,7 @@ const router = express.Router();
 
 router.get("/", protect, admin, async (req, res) => {
   try {
-    const orders = await Order.find({})
-      .populate("user", "name email")
-      .sort({ createdAt: -1 });
+    const orders = await Order.find({}).populate("user", "name email");
 
     res.json(orders);
   } catch (error) {
@@ -27,7 +25,11 @@ router.get("/", protect, admin, async (req, res) => {
 
 router.put("/:id", protect, admin, async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).populate(
+      "user",
+      "name email",
+    );
+
     if (order) {
       order.status = req.body.status || order.status;
       order.isDelivered =

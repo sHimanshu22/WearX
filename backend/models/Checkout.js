@@ -23,11 +23,13 @@ const checkoutItemSchema = new mongoose.Schema(
       required: true,
     },
 
-    quantity : {
-        type : Number ,
-        required : true ,
-        default : 1 
-    }
+    quantity: {
+      type: Number,
+      required: true,
+      default: 1,
+    },
+    size: String,
+    color: String,
   },
   { _id: false },
 );
@@ -103,4 +105,3 @@ const checkoutSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("Checkout", checkoutSchema);
-
