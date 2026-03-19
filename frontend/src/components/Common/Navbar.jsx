@@ -54,14 +54,14 @@ const Navbar = () => {
           </Link>
 
           <Link
-            to="/collections/all?gender=Top Wear"
+            to="/collections/all?category=Top%20Wear"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             Top Wear
           </Link>
 
           <Link
-            to="/collections/all?gender=Bottom Wear"
+            to="/collections/all?category=Bottom%20Wear"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             Bottom Wear
