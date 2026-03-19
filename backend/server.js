@@ -9,7 +9,7 @@ const CheckoutRoutes = require("./routes/CheckoutRoutes");
 const OrderRoutes = require("./routes/orderRoutes");
 const UploadRoutes = require("./routes/uploadRoutes");
 const SubscribeRoutes = require("./routes/SubscriberRoute");
-const AdminRoutes = require("./routes/Adminroutes");
+const AdminRoutes = require("./routes/AdminRoutes");
 const ProductAdminRoutes =  require("./routes/ProductAdminRoutes")
 const AdminOrderRoutes = require("./routes/AdminOrderRoute")
 
