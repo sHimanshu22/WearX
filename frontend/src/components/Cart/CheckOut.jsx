@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PaypalButton from "./PaypalButton";
+import PaypalButton from "./PayPalButton";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { createCheckout } from "../../redux/slices/checkoutSlice";
